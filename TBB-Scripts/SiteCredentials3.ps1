@@ -73,7 +73,7 @@ function Set-ServerCredential {
     foreach ($server in $servers) {
         try {
             cmdkey /add:$server /user:$username /pass:$password
-            Write-Information "Credential added to $server"
+            Write-Output "Credential added to $server"
         } catch {
             Write-Error "Failed to add credential to $server. $_"
         }
