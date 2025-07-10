@@ -1,0 +1,964 @@
+2025/06/23 13:37:30 constants.go:44: ok
+2025/06/23 13:37:30 constants_windows.go:47: Install for all users is set to true so this will require admin access
+2025/06/23 13:37:30 constants_windows.go:128: Registry key path is not found
+2025/06/23 13:37:30 logger.go:28: EST client will be installed in path :  c:\appviewx_est , log file name :  est_Monday.log
+2025/06/23 13:37:30 logger.go:29: Creating folder  c:\.appviewx_est
+2025/06/23 13:37:30 logger.go:37: Creating folder  c:\appviewx_est
+2025/06/23 13:37:30 main.go:66: EST Client installation started
+2025/06/23 13:37:30 main.go:196: Performing prerequisite check
+2025/06/23 13:37:30 main.go:205: Validating DATA file
+2025/06/23 13:37:30 validateInstaller.go:81: Validating fields in secure_config.json file
+2025/06/23 13:37:30 main.go:212: Validating est client executable file
+2025/06/23 13:37:30 main.go:219: Validating config.json file
+2025/06/23 13:37:30 validateInstaller.go:149: Since both config.json and secure_config.json is having data for certificate enrollment, both jsons are compared and the merged json is considered for validations
+2025/06/23 13:37:30 validateInstaller.go:826: EST server section not available in config.json, hence values from secure_config.json will be considered
+2025/06/23 13:37:30 validateInstaller.go:228: Comparing Certificates section for config.json and secure_config.json
+2025/06/23 13:37:30 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 1
+2025/06/23 13:37:30 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 2
+2025/06/23 13:37:30 validateInstaller.go:155: 
+Merged Json  = {
+     "est_servers": [
+         {
+             "certificate_type": "machine",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         },
+         {
+             "certificate_type": "user",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         }
+     ],
+     "certificates": [
+         {
+             "certificate_id": 1,
+             "certificate_type": "machine",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$MACHINE"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         },
+         {
+             "certificate_id": 2,
+             "certificate_type": "user",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "common_name",
+                     "base_value": "$USER",
+                     "additional_value": "@tbdir.net",
+                     "operation": "append",
+                     "san_dns_values": null
+                 },
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$USER@tbdir.net"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         }
+     ]
+ }
+
+2025/06/23 13:37:36 main.go:127: Error while removing the cron expression with file  appviewx_client.exe
+2025/06/23 13:37:36 actions_windows.go:108: Install for all users is set to true so this will require admin access
+2025/06/23 13:37:36 actions_windows.go:36: Since install for all users is made true appviewx_est and .appviewx_est folders are provided Full control permissions for all users
+2025/06/23 13:37:41 main.go:134: Kindly correct the warnings(if any) as said in est log file : est_Monday.log before proceeding with certificate enrollment.
+2025/06/23 13:37:41 main.go:137: EST Client installed successfully
+2025/06/23 14:28:25 constants.go:44: ok
+2025/06/23 14:28:25 constants_windows.go:47: Install for all users is set to true so this will require admin access
+2025/06/23 14:28:25 constants_windows.go:73: Installation already exists in the machine at location :  c:\
+2025/06/23 14:28:25 constants_windows.go:76: Silent uninstallation is set to true so uninstalling old installation without prompt
+2025/06/23 14:28:25 constants_windows.go:79: Removing the previous installation files present at  c:\
+2025/06/23 14:28:25 constants_windows.go:82: Executing uninstall.bat file
+2025/06/23 14:28:25 constants_windows.go:87: Error executing uninstall.bat: exit status 1
+2025/06/23 14:28:25 constants_windows.go:92: Proceeding with new installation
+2025/06/23 14:28:25 logger.go:28: EST client will be installed in path :  c:\appviewx_est , log file name :  est_Monday.log
+2025/06/23 14:28:25 logger.go:29: Creating folder  c:\.appviewx_est
+2025/06/23 14:28:25 logger.go:37: Creating folder  c:\appviewx_est
+2025/06/23 14:28:26 main.go:66: EST Client installation started
+2025/06/23 14:28:26 main.go:196: Performing prerequisite check
+2025/06/23 14:28:26 main.go:205: Validating DATA file
+2025/06/23 14:28:26 validateInstaller.go:81: Validating fields in secure_config.json file
+2025/06/23 14:28:26 main.go:212: Validating est client executable file
+2025/06/23 14:28:26 main.go:219: Validating config.json file
+2025/06/23 14:28:26 validateInstaller.go:149: Since both config.json and secure_config.json is having data for certificate enrollment, both jsons are compared and the merged json is considered for validations
+2025/06/23 14:28:26 validateInstaller.go:826: EST server section not available in config.json, hence values from secure_config.json will be considered
+2025/06/23 14:28:26 validateInstaller.go:228: Comparing Certificates section for config.json and secure_config.json
+2025/06/23 14:28:26 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 1
+2025/06/23 14:28:26 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 2
+2025/06/23 14:28:26 validateInstaller.go:155: 
+Merged Json  = {
+     "est_servers": [
+         {
+             "certificate_type": "machine",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         },
+         {
+             "certificate_type": "user",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         }
+     ],
+     "certificates": [
+         {
+             "certificate_id": 1,
+             "certificate_type": "machine",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$MACHINE"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         },
+         {
+             "certificate_id": 2,
+             "certificate_type": "user",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "common_name",
+                     "base_value": "$USER",
+                     "additional_value": "@tbdir.net",
+                     "operation": "append",
+                     "san_dns_values": null
+                 },
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$USER@tbdir.net"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         }
+     ]
+ }
+
+2025/06/23 14:28:28 main.go:127: Error while removing the cron expression with file  appviewx_client.exe
+2025/06/23 14:28:28 actions_windows.go:108: Install for all users is set to true so this will require admin access
+2025/06/23 14:28:28 actions_windows.go:36: Since install for all users is made true appviewx_est and .appviewx_est folders are provided Full control permissions for all users
+2025/06/23 14:28:33 main.go:134: Kindly correct the warnings(if any) as said in est log file : est_Monday.log before proceeding with certificate enrollment.
+2025/06/23 14:28:33 main.go:137: EST Client installed successfully
+2025/06/23 16:52:08 constants.go:44: ok
+2025/06/23 16:52:08 constants_windows.go:47: Install for all users is set to true so this will require admin access
+2025/06/23 16:52:08 constants_windows.go:73: Installation already exists in the machine at location :  c:\
+2025/06/23 16:52:08 constants_windows.go:76: Silent uninstallation is set to true so uninstalling old installation without prompt
+2025/06/23 16:52:08 constants_windows.go:79: Removing the previous installation files present at  c:\
+2025/06/23 16:52:08 constants_windows.go:82: Executing uninstall.bat file
+2025/06/23 16:52:09 constants_windows.go:87: Error executing uninstall.bat: exit status 1
+2025/06/23 16:52:09 constants_windows.go:92: Proceeding with new installation
+2025/06/23 16:52:09 logger.go:28: EST client will be installed in path :  c:\appviewx_est , log file name :  est_Monday.log
+2025/06/23 16:52:09 logger.go:29: Creating folder  c:\.appviewx_est
+2025/06/23 16:52:09 logger.go:37: Creating folder  c:\appviewx_est
+2025/06/23 16:52:10 main.go:66: EST Client installation started
+2025/06/23 16:52:10 main.go:196: Performing prerequisite check
+2025/06/23 16:52:10 main.go:205: Validating DATA file
+2025/06/23 16:52:10 validateInstaller.go:81: Validating fields in secure_config.json file
+2025/06/23 16:52:10 main.go:212: Validating est client executable file
+2025/06/23 16:52:10 main.go:219: Validating config.json file
+2025/06/23 16:52:10 validateInstaller.go:149: Since both config.json and secure_config.json is having data for certificate enrollment, both jsons are compared and the merged json is considered for validations
+2025/06/23 16:52:10 validateInstaller.go:826: EST server section not available in config.json, hence values from secure_config.json will be considered
+2025/06/23 16:52:10 validateInstaller.go:228: Comparing Certificates section for config.json and secure_config.json
+2025/06/23 16:52:10 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 1
+2025/06/23 16:52:10 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 2
+2025/06/23 16:52:10 validateInstaller.go:155: 
+Merged Json  = {
+     "est_servers": [
+         {
+             "certificate_type": "machine",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         },
+         {
+             "certificate_type": "user",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         }
+     ],
+     "certificates": [
+         {
+             "certificate_id": 1,
+             "certificate_type": "machine",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$MACHINE"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         },
+         {
+             "certificate_id": 2,
+             "certificate_type": "user",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "common_name",
+                     "base_value": "$USER",
+                     "additional_value": "@tbdir.net",
+                     "operation": "append",
+                     "san_dns_values": null
+                 },
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$USER@tbdir.net"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         }
+     ]
+ }
+
+2025/06/23 16:52:14 main.go:127: Error while removing the cron expression with file  appviewx_client.exe
+2025/06/23 16:52:14 actions_windows.go:108: Install for all users is set to true so this will require admin access
+2025/06/23 16:52:14 actions_windows.go:36: Since install for all users is made true appviewx_est and .appviewx_est folders are provided Full control permissions for all users
+2025/06/23 16:52:19 main.go:134: Kindly correct the warnings(if any) as said in est log file : est_Monday.log before proceeding with certificate enrollment.
+2025/06/23 16:52:19 main.go:137: EST Client installed successfully
+2025/06/24 10:18:03 constants.go:44: ok
+2025/06/24 10:18:03 constants_windows.go:47: Install for all users is set to true so this will require admin access
+2025/06/24 10:18:03 constants_windows.go:73: Installation already exists in the machine at location :  c:\
+2025/06/24 10:18:03 constants_windows.go:76: Silent uninstallation is set to true so uninstalling old installation without prompt
+2025/06/24 10:18:03 constants_windows.go:79: Removing the previous installation files present at  c:\
+2025/06/24 10:18:03 constants_windows.go:82: Executing uninstall.bat file
+2025/06/24 10:18:04 constants_windows.go:87: Error executing uninstall.bat: exit status 1
+2025/06/24 10:18:04 constants_windows.go:92: Proceeding with new installation
+2025/06/24 10:18:04 logger.go:28: EST client will be installed in path :  c:\appviewx_est , log file name :  est_Tuesday.log
+2025/06/24 10:18:04 logger.go:29: Creating folder  c:\.appviewx_est
+2025/06/24 10:18:04 logger.go:37: Creating folder  c:\appviewx_est
+2025/06/24 10:18:04 main.go:66: EST Client installation started
+2025/06/24 10:18:04 main.go:196: Performing prerequisite check
+2025/06/24 10:18:04 main.go:205: Validating DATA file
+2025/06/24 10:18:04 validateInstaller.go:81: Validating fields in secure_config.json file
+2025/06/24 10:18:04 main.go:212: Validating est client executable file
+2025/06/24 10:18:04 main.go:219: Validating config.json file
+2025/06/24 10:18:04 validateInstaller.go:149: Since both config.json and secure_config.json is having data for certificate enrollment, both jsons are compared and the merged json is considered for validations
+2025/06/24 10:18:04 validateInstaller.go:826: EST server section not available in config.json, hence values from secure_config.json will be considered
+2025/06/24 10:18:04 validateInstaller.go:228: Comparing Certificates section for config.json and secure_config.json
+2025/06/24 10:18:04 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 1
+2025/06/24 10:18:04 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 2
+2025/06/24 10:18:04 validateInstaller.go:155: 
+Merged Json  = {
+     "est_servers": [
+         {
+             "certificate_type": "user",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         },
+         {
+             "certificate_type": "machine",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         }
+     ],
+     "certificates": [
+         {
+             "certificate_id": 1,
+             "certificate_type": "machine",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$MACHINE"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         },
+         {
+             "certificate_id": 2,
+             "certificate_type": "user",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "common_name",
+                     "base_value": "$USER",
+                     "additional_value": "@tbdir.net",
+                     "operation": "append",
+                     "san_dns_values": null
+                 },
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$USER@tbdir.net"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         }
+     ]
+ }
+
+2025/06/24 10:18:10 main.go:127: Error while removing the cron expression with file  appviewx_client.exe
+2025/06/24 10:18:10 actions_windows.go:108: Install for all users is set to true so this will require admin access
+2025/06/24 10:18:10 actions_windows.go:36: Since install for all users is made true appviewx_est and .appviewx_est folders are provided Full control permissions for all users
+2025/06/24 10:18:13 main.go:134: Kindly correct the warnings(if any) as said in est log file : est_Tuesday.log before proceeding with certificate enrollment.
+2025/06/24 10:18:13 main.go:137: EST Client installed successfully
+2025/06/24 11:23:41 constants.go:44: ok
+2025/06/24 11:23:42 constants_windows.go:47: Install for all users is set to true so this will require admin access
+2025/06/24 11:23:42 constants_windows.go:73: Installation already exists in the machine at location :  c:\
+2025/06/24 11:23:42 constants_windows.go:76: Silent uninstallation is set to true so uninstalling old installation without prompt
+2025/06/24 11:23:42 constants_windows.go:79: Removing the previous installation files present at  c:\
+2025/06/24 11:23:42 constants_windows.go:82: Executing uninstall.bat file
+2025/06/24 11:23:42 constants_windows.go:87: Error executing uninstall.bat: exit status 1
+2025/06/24 11:23:42 constants_windows.go:92: Proceeding with new installation
+2025/06/24 11:23:42 logger.go:28: EST client will be installed in path :  c:\appviewx_est , log file name :  est_Tuesday.log
+2025/06/24 11:23:42 logger.go:29: Creating folder  c:\.appviewx_est
+2025/06/24 11:23:42 logger.go:37: Creating folder  c:\appviewx_est
+2025/06/24 11:23:43 main.go:66: EST Client installation started
+2025/06/24 11:23:43 main.go:196: Performing prerequisite check
+2025/06/24 11:23:43 main.go:205: Validating DATA file
+2025/06/24 11:23:43 validateInstaller.go:81: Validating fields in secure_config.json file
+2025/06/24 11:23:43 main.go:212: Validating est client executable file
+2025/06/24 11:23:43 main.go:219: Validating config.json file
+2025/06/24 11:23:43 validateInstaller.go:149: Since both config.json and secure_config.json is having data for certificate enrollment, both jsons are compared and the merged json is considered for validations
+2025/06/24 11:23:43 validateInstaller.go:826: EST server section not available in config.json, hence values from secure_config.json will be considered
+2025/06/24 11:23:43 validateInstaller.go:228: Comparing Certificates section for config.json and secure_config.json
+2025/06/24 11:23:43 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 1
+2025/06/24 11:23:43 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 2
+2025/06/24 11:23:43 validateInstaller.go:155: 
+Merged Json  = {
+     "est_servers": [
+         {
+             "certificate_type": "machine",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         },
+         {
+             "certificate_type": "user",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         }
+     ],
+     "certificates": [
+         {
+             "certificate_id": 1,
+             "certificate_type": "machine",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$MACHINE"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         },
+         {
+             "certificate_id": 2,
+             "certificate_type": "user",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "common_name",
+                     "base_value": "$USER",
+                     "additional_value": "@tbdir.net",
+                     "operation": "append",
+                     "san_dns_values": null
+                 },
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$USER@tbdir.net"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         }
+     ]
+ }
+
+2025/06/24 11:23:48 main.go:127: Error while removing the cron expression with file  appviewx_client.exe
+2025/06/24 11:23:48 actions_windows.go:108: Install for all users is set to true so this will require admin access
+2025/06/24 11:23:48 actions_windows.go:36: Since install for all users is made true appviewx_est and .appviewx_est folders are provided Full control permissions for all users
+2025/06/24 11:23:58 main.go:134: Kindly correct the warnings(if any) as said in est log file : est_Tuesday.log before proceeding with certificate enrollment.
+2025/06/24 11:23:58 main.go:137: EST Client installed successfully
+2025/06/24 11:42:57 constants.go:44: ok
+2025/06/24 11:42:57 constants_windows.go:47: Install for all users is set to true so this will require admin access
+2025/06/24 11:42:57 constants_windows.go:73: Installation already exists in the machine at location :  c:\
+2025/06/24 11:42:57 constants_windows.go:76: Silent uninstallation is set to true so uninstalling old installation without prompt
+2025/06/24 11:42:57 constants_windows.go:79: Removing the previous installation files present at  c:\
+2025/06/24 11:42:57 constants_windows.go:82: Executing uninstall.bat file
+2025/06/24 11:42:57 constants_windows.go:87: Error executing uninstall.bat: exit status 1
+2025/06/24 11:42:57 constants_windows.go:92: Proceeding with new installation
+2025/06/24 11:42:57 logger.go:28: EST client will be installed in path :  c:\appviewx_est , log file name :  est_Tuesday.log
+2025/06/24 11:42:57 logger.go:29: Creating folder  c:\.appviewx_est
+2025/06/24 11:42:57 logger.go:37: Creating folder  c:\appviewx_est
+2025/06/24 11:42:58 main.go:66: EST Client installation started
+2025/06/24 11:42:58 main.go:196: Performing prerequisite check
+2025/06/24 11:42:58 main.go:205: Validating DATA file
+2025/06/24 11:42:58 validateInstaller.go:81: Validating fields in secure_config.json file
+2025/06/24 11:42:58 main.go:212: Validating est client executable file
+2025/06/24 11:42:58 main.go:219: Validating config.json file
+2025/06/24 11:42:58 validateInstaller.go:149: Since both config.json and secure_config.json is having data for certificate enrollment, both jsons are compared and the merged json is considered for validations
+2025/06/24 11:42:58 validateInstaller.go:826: EST server section not available in config.json, hence values from secure_config.json will be considered
+2025/06/24 11:42:58 validateInstaller.go:228: Comparing Certificates section for config.json and secure_config.json
+2025/06/24 11:42:58 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 1
+2025/06/24 11:42:58 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 2
+2025/06/24 11:42:58 validateInstaller.go:155: 
+Merged Json  = {
+     "est_servers": [
+         {
+             "certificate_type": "machine",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         },
+         {
+             "certificate_type": "user",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         }
+     ],
+     "certificates": [
+         {
+             "certificate_id": 1,
+             "certificate_type": "machine",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$MACHINE"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         },
+         {
+             "certificate_id": 2,
+             "certificate_type": "user",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "common_name",
+                     "base_value": "$USER",
+                     "additional_value": "@tbdir.net",
+                     "operation": "append",
+                     "san_dns_values": null
+                 },
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$USER@tbdir.net"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         }
+     ]
+ }
+
+2025/06/24 11:43:00 main.go:127: Error while removing the cron expression with file  appviewx_client.exe
+2025/06/24 11:43:00 actions_windows.go:108: Install for all users is set to true so this will require admin access
+2025/06/24 11:43:00 actions_windows.go:36: Since install for all users is made true appviewx_est and .appviewx_est folders are provided Full control permissions for all users
+2025/06/24 11:43:09 main.go:134: Kindly correct the warnings(if any) as said in est log file : est_Tuesday.log before proceeding with certificate enrollment.
+2025/06/24 11:43:09 main.go:137: EST Client installed successfully
+2025/06/24 15:40:31 constants.go:44: ok
+2025/06/24 15:40:31 constants_windows.go:47: Install for all users is set to true so this will require admin access
+2025/06/24 15:40:31 constants_windows.go:73: Installation already exists in the machine at location :  c:\
+2025/06/24 15:40:31 constants_windows.go:76: Silent uninstallation is set to true so uninstalling old installation without prompt
+2025/06/24 15:40:31 constants_windows.go:79: Removing the previous installation files present at  c:\
+2025/06/24 15:40:31 constants_windows.go:82: Executing uninstall.bat file
+2025/06/24 15:40:38 constants_windows.go:92: Proceeding with new installation
+2025/06/24 15:40:38 logger.go:28: EST client will be installed in path :  c:\appviewx_est , log file name :  est_Tuesday.log
+2025/06/24 15:40:38 logger.go:29: Creating folder  c:\.appviewx_est
+2025/06/24 15:40:38 logger.go:37: Creating folder  c:\appviewx_est
+2025/06/24 15:40:39 main.go:66: EST Client installation started
+2025/06/24 15:40:39 main.go:196: Performing prerequisite check
+2025/06/24 15:40:39 main.go:205: Validating DATA file
+2025/06/24 15:40:39 validateInstaller.go:81: Validating fields in secure_config.json file
+2025/06/24 15:40:39 main.go:212: Validating est client executable file
+2025/06/24 15:40:39 main.go:219: Validating config.json file
+2025/06/24 15:40:39 validateInstaller.go:149: Since both config.json and secure_config.json is having data for certificate enrollment, both jsons are compared and the merged json is considered for validations
+2025/06/24 15:40:39 validateInstaller.go:826: EST server section not available in config.json, hence values from secure_config.json will be considered
+2025/06/24 15:40:39 validateInstaller.go:228: Comparing Certificates section for config.json and secure_config.json
+2025/06/24 15:40:39 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 1
+2025/06/24 15:40:39 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 2
+2025/06/24 15:40:39 validateInstaller.go:155: 
+Merged Json  = {
+     "est_servers": [
+         {
+             "certificate_type": "machine",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         },
+         {
+             "certificate_type": "user",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         }
+     ],
+     "certificates": [
+         {
+             "certificate_id": 1,
+             "certificate_type": "machine",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$MACHINE"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         },
+         {
+             "certificate_id": 2,
+             "certificate_type": "user",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "common_name",
+                     "base_value": "$USER",
+                     "additional_value": "@tbdir.net",
+                     "operation": "append",
+                     "san_dns_values": null
+                 },
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$USER@tbdir.net"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         }
+     ]
+ }
+
+2025/06/24 15:40:42 main.go:127: Error while removing the cron expression with file  appviewx_client.exe
+2025/06/24 15:40:43 actions_windows.go:108: Install for all users is set to true so this will require admin access
+2025/06/24 15:40:43 actions_windows.go:36: Since install for all users is made true appviewx_est and .appviewx_est folders are provided Full control permissions for all users
+2025/06/24 15:40:51 main.go:134: Kindly correct the warnings(if any) as said in est log file : est_Tuesday.log before proceeding with certificate enrollment.
+2025/06/24 15:40:51 main.go:137: EST Client installed successfully
+2025/06/24 16:14:41 constants.go:44: ok
+2025/06/24 16:14:41 constants_windows.go:47: Install for all users is set to true so this will require admin access
+2025/06/24 16:14:41 constants_windows.go:73: Installation already exists in the machine at location :  c:\
+2025/06/24 16:14:41 constants_windows.go:76: Silent uninstallation is set to true so uninstalling old installation without prompt
+2025/06/24 16:14:41 constants_windows.go:79: Removing the previous installation files present at  c:\
+2025/06/24 16:14:41 constants_windows.go:82: Executing uninstall.bat file
+2025/06/24 16:14:47 constants_windows.go:92: Proceeding with new installation
+2025/06/24 16:14:47 logger.go:28: EST client will be installed in path :  c:\appviewx_est , log file name :  est_Tuesday.log
+2025/06/24 16:14:47 logger.go:29: Creating folder  c:\.appviewx_est
+2025/06/24 16:14:47 logger.go:37: Creating folder  c:\appviewx_est
+2025/06/24 16:14:47 main.go:66: EST Client installation started
+2025/06/24 16:14:47 main.go:196: Performing prerequisite check
+2025/06/24 16:14:47 main.go:205: Validating DATA file
+2025/06/24 16:14:47 validateInstaller.go:81: Validating fields in secure_config.json file
+2025/06/24 16:14:47 main.go:212: Validating est client executable file
+2025/06/24 16:14:47 main.go:219: Validating config.json file
+2025/06/24 16:14:47 validateInstaller.go:149: Since both config.json and secure_config.json is having data for certificate enrollment, both jsons are compared and the merged json is considered for validations
+2025/06/24 16:14:47 validateInstaller.go:826: EST server section not available in config.json, hence values from secure_config.json will be considered
+2025/06/24 16:14:47 validateInstaller.go:228: Comparing Certificates section for config.json and secure_config.json
+2025/06/24 16:14:47 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 1
+2025/06/24 16:14:47 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 2
+2025/06/24 16:14:47 validateInstaller.go:155: 
+Merged Json  = {
+     "est_servers": [
+         {
+             "certificate_type": "machine",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         },
+         {
+             "certificate_type": "user",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         }
+     ],
+     "certificates": [
+         {
+             "certificate_id": 1,
+             "certificate_type": "machine",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$MACHINE"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         },
+         {
+             "certificate_id": 2,
+             "certificate_type": "user",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$USER@tbdir.net"
+                     ]
+                 },
+                 {
+                     "field_name": "common_name",
+                     "base_value": "$USER",
+                     "additional_value": "@tbdir.net",
+                     "operation": "append",
+                     "san_dns_values": null
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         }
+     ]
+ }
+
+2025/06/24 16:14:51 main.go:127: Error while removing the cron expression with file  appviewx_client.exe
+2025/06/24 16:14:51 actions_windows.go:108: Install for all users is set to true so this will require admin access
+2025/06/24 16:14:51 actions_windows.go:36: Since install for all users is made true appviewx_est and .appviewx_est folders are provided Full control permissions for all users
+2025/06/24 16:15:01 main.go:134: Kindly correct the warnings(if any) as said in est log file : est_Tuesday.log before proceeding with certificate enrollment.
+2025/06/24 16:15:01 main.go:137: EST Client installed successfully
+2025/06/24 16:50:46 constants.go:44: ok
+2025/06/24 16:50:47 constants_windows.go:47: Install for all users is set to true so this will require admin access
+2025/06/24 16:50:47 constants_windows.go:73: Installation already exists in the machine at location :  c:\
+2025/06/24 16:50:47 constants_windows.go:76: Silent uninstallation is set to true so uninstalling old installation without prompt
+2025/06/24 16:50:47 constants_windows.go:79: Removing the previous installation files present at  c:\
+2025/06/24 16:50:47 constants_windows.go:82: Executing uninstall.bat file
+2025/06/24 16:50:53 constants_windows.go:92: Proceeding with new installation
+2025/06/24 16:50:53 logger.go:28: EST client will be installed in path :  c:\appviewx_est , log file name :  est_Tuesday.log
+2025/06/24 16:50:53 logger.go:29: Creating folder  c:\.appviewx_est
+2025/06/24 16:50:53 logger.go:37: Creating folder  c:\appviewx_est
+2025/06/24 16:50:53 main.go:66: EST Client installation started
+2025/06/24 16:50:53 main.go:196: Performing prerequisite check
+2025/06/24 16:50:53 main.go:205: Validating DATA file
+2025/06/24 16:50:53 validateInstaller.go:81: Validating fields in secure_config.json file
+2025/06/24 16:50:53 main.go:212: Validating est client executable file
+2025/06/24 16:50:53 main.go:219: Validating config.json file
+2025/06/24 16:50:53 validateInstaller.go:149: Since both config.json and secure_config.json is having data for certificate enrollment, both jsons are compared and the merged json is considered for validations
+2025/06/24 16:50:53 validateInstaller.go:826: EST server section not available in config.json, hence values from secure_config.json will be considered
+2025/06/24 16:50:53 validateInstaller.go:228: Comparing Certificates section for config.json and secure_config.json
+2025/06/24 16:50:53 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 1
+2025/06/24 16:50:53 validateInstaller.go:433: Validating config.json and secure_config.json for certificate id 2
+2025/06/24 16:50:53 validateInstaller.go:155: 
+Merged Json  = {
+     "est_servers": [
+         {
+             "certificate_type": "machine",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         },
+         {
+             "certificate_type": "user",
+             "host_name": "est.app.tbintra.net",
+             "port": 443,
+             "path_seg": "LegWin10",
+             "auth_type": "",
+             "user_name": "",
+             "password": ""
+         }
+     ],
+     "certificates": [
+         {
+             "certificate_id": 1,
+             "certificate_type": "machine",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$MACHINE"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         },
+         {
+             "certificate_id": 2,
+             "certificate_type": "user",
+             "certificate_country": "",
+             "certificate_province": "",
+             "certificate_locality": "",
+             "certificate_organization": "Daimler Truck AG",
+             "certificate_organization_unit": "DTG network access",
+             "certificate_email_address": "",
+             "reenrollment_trigger_before_no_of_days_of_expiry": 60,
+             "custom_values": [
+                 {
+                     "field_name": "common_name",
+                     "base_value": "$USER",
+                     "additional_value": "@tbdir.net",
+                     "operation": "append",
+                     "san_dns_values": null
+                 },
+                 {
+                     "field_name": "san_dns",
+                     "base_value": "",
+                     "additional_value": "",
+                     "operation": "",
+                     "san_dns_values": [
+                         "$USER@tbdir.net"
+                     ]
+                 }
+             ],
+             "customAttributes": null,
+             "certificateAttributes": null
+         }
+     ]
+ }
+
+2025/06/24 16:50:57 main.go:127: Error while removing the cron expression with file  appviewx_client.exe
+2025/06/24 16:50:57 actions_windows.go:108: Install for all users is set to true so this will require admin access
+2025/06/24 16:50:57 actions_windows.go:36: Since install for all users is made true appviewx_est and .appviewx_est folders are provided Full control permissions for all users
+2025/06/24 16:51:07 main.go:134: Kindly correct the warnings(if any) as said in est log file : est_Tuesday.log before proceeding with certificate enrollment.
+2025/06/24 16:51:07 main.go:137: EST Client installed successfully
