@@ -16,14 +16,16 @@ function Set-ClassicContextMenu {
     #>
     [CmdletBinding()]
     param ()
-    $regPath = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'
+    $regKeyPath = 'Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'
     try {
-        if (-not (Test-Path $regPath)) {
-            New-Item -Path $regPath -Force | Out-Null
-            Set-ItemProperty -Path $regPath -Name '' -Value '' -Force
+        $userRoot = [Microsoft.Win32.Registry]::CurrentUser
+        $key = $userRoot.CreateSubKey($regKeyPath)
+        if ($key) {
+            $key.SetValue($null, '', [Microsoft.Win32.RegistryValueKind]::String)
+            $key.Close()
             Write-Output 'Classic context menu registry key set successfully.'
         } else {
-            Write-Output 'Classic context menu registry key already exists.'
+            Write-Error 'Failed to create or open the registry key.'
         }
     } catch {
         Write-Error "Failed to set registry key: $($_.Exception.Message)"
