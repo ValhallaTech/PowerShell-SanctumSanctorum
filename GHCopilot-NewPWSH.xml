@@ -8,6 +8,7 @@
   </task>
 
   <requirements>
+    <!--Insert script requirements here by replacing 'xxx'-->
     xxx
   </requirements>
 
@@ -30,6 +31,7 @@
       <rule>Use splatting for cmdlet parameters where appropriate.</rule>
       <rule>Add inline comments for clarity.</rule>
       <rule>Ensure compatibility with PowerShell 5.1.</rule>
+      <rule>Implement robust error handling and logging.</rule>
     </syntax>
 
     <structure>
@@ -42,6 +44,10 @@
       <rule>Import only required modules.</rule>
       <rule>Check module usage, identify introduced cmdlets, and reference official documentation or GitHub if applicable.</rule>
     </modules>
+    <requiredmodules>
+      <!--Insert required module(s) here by replacing 'xxx', if any. If not, put 'none'.-->
+      <module>xxx</module>
+    </requiredmodules>
   </guidelines>
 
   <output>
