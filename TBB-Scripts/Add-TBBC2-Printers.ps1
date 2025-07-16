@@ -5,7 +5,7 @@
     Detects the drive letter for the Ricoh and Zebra driver folders, stages and installs the drivers, and adds printers by IP using the installed drivers. Printers are named in uppercase according to their official names. All actions are logged.
 .NOTES
     Compatible with PowerShell 5.1
-    Author: [Your Name]
+    Author: Fred Smith III
 #>
 
 function Get-ExternalDriveLetter {
