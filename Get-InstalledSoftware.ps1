@@ -1,123 +1,207 @@
-# Install Nuget Provider, if not already installed
-Install-PackageProvider -Name "NuGet" -Force
+<#
+.SYNOPSIS
+    Installs and configures logging and parallel processing modules, then retrieves a list of all installed software on the system.
 
-# Set PSGallery as a trusted repository
-Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+.DESCRIPTION
+    This script ensures the NuGet provider and PSGallery repository are available and trusted, installs and imports the PoShLog and PSParallel modules,
+    configures logging to both file and console, and defines a function to scan the registry for installed software (optionally filtered by name).
+    Results are logged and displayed. The script uses best practices for PowerShell scripting, including modularization, error handling, and clear logging.
 
-# Variables for PoShLog checking
-$modPoShLog = "PoShLog"
-$chkPoShLog = Get-Module -Name $modPoShLog
+.PARAMETER Name
+    Optional filter to limit results to software names containing this string. Supports wildcard matching.
 
-# Check if PoShLog module is installed and if not install the current version
-if (-not $chkPoShLog) {
-    Install-Module -Name $modPoShLog
-}
+.NOTES
+    Author: Fred Smith III
+    Version: 1.2.0
+    Requires: PowerShell 5.1+, PoShLog, PSParallel
 
-# Import PoShLog module
-Import-Module -Name $modPoShLog
+.EXAMPLE
+    .\Get-InstalledSoftware120.ps1
+    Retrieves and logs all installed software on the system.
 
-# Configure variables for logging
-$logFileName = "Get-InstalledSoftware.log"
-$logFilePath = "$systemDrive\Logs\$logFileName"
+.EXAMPLE
+    .\Get-InstalledSoftware120.ps1 -Name 'Microsoft'
+    Retrieves and logs all installed software with names containing 'Microsoft'.
+#>
 
-# Create logger instance
-$logger = New-Logger
+[CmdletBinding()]
+param(
+    [string]$Name
+)
 
-# Configure logger instance
-$logger |
-    Set-MinimumLevel -Value Information |
-    Add-SinkFile -Path $logFilePath |
-    Add-SinkConsole |
-    Start-Logger
-
-Write-InfoLog "PoShLog module imported and logger configured"
-
-# Variables for PSParallel checking
-$modPSParallel = "PSParallel"
-$chkPSParallel = Get-Module -Name $modPSParallel
-
-# Check if PSParallel module is installed and if not install the current version
-if (-not $chkPSParallel) {
-    try {
-        Install-Module -Name $modPSParallel -ErrorAction Stop
-    } catch {
-        Write-ErrorLog "Failed to install PSParallel module: $_"
-        exit 1
+# Ensure NuGet provider is installed
+function Install-NugetProvider {
+    if (-not (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue)) {
+        Install-PackageProvider -Name 'NuGet' -Force
     }
 }
 
-# Import PSParallel module
-try {
-    Import-Module -Name $modPSParallel -ErrorAction Stop
-} catch {
-    Write-ErrorLog "Failed to import PSParallel module: $_"
-    exit 1
+# Ensure PSGallery is trusted
+function Set-PsGalleryTrusted {
+    $psGallery = Get-PSRepository -Name 'PSGallery'
+    if ($psGallery.InstallationPolicy -ne 'Trusted') {
+        Set-PSRepository -Name 'PSGallery' -InstallationPolicy 'Trusted'
+    }
 }
 
-Write-InfoLog "PSParallel module imported"
+# Helper to install and import modules if not already available
+function Import-RequiredModule {
+    param (
+        [string]$moduleName
+    )
+    if (-not (Get-Module -ListAvailable -Name $moduleName)) {
+        Install-Module -Name $moduleName -Force -Scope CurrentUser
+    }
+    Import-Module -Name $moduleName -Force
+}
+
+# --- Script Start ---
+# Install NuGet provider and trust PSGallery for unattended module installation
+Write-Output "Setting up NuGet provider and PSGallery repository..."
+Install-NugetProvider
+Set-PsGalleryTrusted
+
+# Import PoShLog and PSParallel modules
+Write-Output "Importing required modules..."
+Import-RequiredModule -moduleName 'PoShLog'
+Import-RequiredModule -moduleName 'PSParallel'
+
+# Configure logging
+$logFileName = 'Get-InstalledSoftware.log'
+$logFilePath = "$env:SystemDrive\Logs\$logFileName"
+
+# Start logger
+$logger = New-Logger
+$logger |
+Set-MinimumLevel -Value Information |
+Add-SinkFile -Path $logFilePath |
+Add-SinkConsole |
+Start-Logger
+
+Write-InfoLog 'PoShLog module imported and logger configured'
+Write-InfoLog 'PSParallel module imported'
+
 function Get-InstalledSoftware {
     <#
     .SYNOPSIS
-        Retrieves a list of all software installed
+        Retrieves a list of all software installed on the system.
     .DESCRIPTION
-        This function scans the registry to find the GUID of software installed on the computer.
+        Scans the Windows registry to find installed software GUIDs and display names.
+        Searches both machine-level and user-level installation locations.
+    .PARAMETER Name
+        Optional filter to limit results to software names containing this string.
+        Supports partial matches (e.g., 'Microsoft' will match 'Microsoft Office').
     .EXAMPLE
         Get-InstalledSoftware
-        This example retrieves all software installed on the local computer
-    .PARAMETER name
-    The software title you'd like to limit the query to. 
-    Accepts partial matches, e.g. 'Microsoft'.
+        Returns all installed software on the system.
     .EXAMPLE
-    Get-InstalledSoftware -name "Microsoft"
-    Retrieves all installed software with names like "Microsoft*"
-    .AUTHOR
-        Fred Smith III
-    .VERSION
-        1.1.0
+        Get-InstalledSoftware -Name 'Microsoft'
+        Returns only software with names containing 'Microsoft'.
+    .OUTPUTS
+        [PSCustomObject[]] Array of objects containing GUID and Name properties.
     #>
     [OutputType([System.Management.Automation.PSObject])]
     [CmdletBinding()]
     param (
-        [Parameter()]
-        [ValidateNotNullOrEmpty()]
-        [string]$name
+        [string]$Name
     )
-    $uninstallKeys = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall", "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
-    $null = New-PSDrive -Name HKU -PSProvider Registry -Root Registry::HKEY_USERS
-    $uninstallKeys += Get-ChildItem HKU: -ErrorAction SilentlyContinue | 
-        Where-Object { $_.name -match 'S-\d-\d+-(\d+-){1,14}\d+$' } | 
-        ForEach-Object { "HKU:\$($_.PSChildName)\Software\Microsoft\Windows\CurrentVersion\Uninstall" }
+    # Registry paths to search for installed software
+    $uninstallKeys = @(
+        'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall',
+        'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
+    )
+    
+    # Add user-specific uninstall keys
+    $hkuDrive = $null
+    try {
+        $hkuDrive = New-PSDrive -Name HKU -PSProvider Registry -Root 'Registry::HKEY_USERS' -ErrorAction Stop
+        $userKeys = Get-ChildItem HKU: -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match 'S-\d-\d+-(\d+-){1,14}\d+$' } |
+            ForEach-Object { "HKU:\$($_.PSChildName)\Software\Microsoft\Windows\CurrentVersion\Uninstall" }
+        $uninstallKeys += $userKeys
+    }
+    catch {
+        Write-WarningLog "Failed to access user registry hives: $($_.Exception.Message)"
+    }
 
     if (-not $uninstallKeys) {
-        Write-InfoLog -Message 'No software registry keys found'
-    } else {
+        Write-InfoLog 'No software registry keys found'
+        return @()
+    }
+
+    # Query each uninstall key in parallel
+    if ($PSBoundParameters.ContainsKey('Name') -and $Name) {
+        # Filter by name
         $results = $uninstallKeys | Invoke-Parallel -ThrottleLimit 16 -ScriptBlock {
             $uninstallKey = $_
-            $name = $args[0]
-            if ($name) {
-                $whereBlock = { ($_.PSChildName -match '^{[A-Z0-9]{8}-([A-Z0-9]{4}-){3}[A-Z0-9]{12}}$') -and ($_.GetValue('DisplayName') -like "$name*") }
-            } else {
-                $whereBlock = { ($_.PSChildName -match '^{[A-Z0-9]{8}-([A-Z0-9]{4}-){3}[A-Z0-9]{12}}$') -and ($_.GetValue('DisplayName')) }
-            }
+            $nameFilter = $args[0]
+            
             $gciParams = @{
                 Path        = $uninstallKey
                 ErrorAction = 'SilentlyContinue'
             }
             $selectProperties = @(
-                @{n='GUID'; e={$_.PSChildName}},
-                @{n='name'; e={$_.GetValue('DisplayName')}}
+                @{n = 'GUID'; e = { $_.PSChildName } },
+                @{n = 'Name'; e = { $_.GetValue('DisplayName') } }
             )
-            Get-ChildItem @gciParams | Where-Object $whereBlock | Select-Object -Property $selectProperties
+            
+            Get-ChildItem @gciParams | 
+                Where-Object { ($_.PSChildName -match '^{[A-Z0-9]{8}-([A-Z0-9]{4}-){3}[A-Z0-9]{12}}$') -and ($_.GetValue('DisplayName') -like "*$nameFilter*") } | 
+                Select-Object -Property $selectProperties
+        } $Name
+    } else {
+        # No filter - get all software
+        $results = $uninstallKeys | Invoke-Parallel -ThrottleLimit 16 -ScriptBlock {
+            $uninstallKey = $_
+            
+            $gciParams = @{
+                Path        = $uninstallKey
+                ErrorAction = 'SilentlyContinue'
+            }
+            $selectProperties = @(
+                @{n = 'GUID'; e = { $_.PSChildName } },
+                @{n = 'Name'; e = { $_.GetValue('DisplayName') } }
+            )
+            
+            Get-ChildItem @gciParams | 
+                Where-Object { ($_.PSChildName -match '^{[A-Z0-9]{8}-([A-Z0-9]{4}-){3}[A-Z0-9]{12}}$') -and ($_.GetValue('DisplayName')) } | 
+                Select-Object -Property $selectProperties
         }
-
-        Write-InfoLog "Get-InstalledSoftware - List of software found:"
-        $results | ForEach-Object {
-            Write-InfoLog "Name: $($_.Name) - GUID: $($_.GUID)"
-        }
-
-        return $results
-        Close-Logger
     }
+
+    # Clean up HKU drive if created
+    if ($hkuDrive) {
+        try {
+            Remove-PSDrive -Name HKU -Force -ErrorAction SilentlyContinue
+        }
+        catch {
+            Write-WarningLog "Failed to remove HKU drive: $($_.Exception.Message)"
+        }
+    }
+
+    # Sort results alphabetically by software name
+    $results = $results | Sort-Object -Property Name
+
+    Write-InfoLog "Get-InstalledSoftware - Found $($results.Count) software entries"
+    $results | ForEach-Object {
+        Write-InfoLog "Name: $($_.Name) - GUID: $($_.GUID)"
+    }
+
+    return $results
 }
 
-Get-InstalledSoftware
+try {
+    # Run the function with script parameter (only pass Name if it has a value)
+    if ($PSBoundParameters.ContainsKey('Name') -and $Name) {
+        Get-InstalledSoftware -Name $Name
+    } else {
+        Get-InstalledSoftware
+    }
+}
+catch {
+    Write-ErrorLog "Script failed: $($_.Exception.Message)"
+    throw
+}
+finally {
+    Close-Logger
+}
