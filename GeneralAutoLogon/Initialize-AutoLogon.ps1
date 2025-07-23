@@ -1,160 +1,333 @@
-# Initialize-Autologon
-
 <#
 .SYNOPSIS
-Configures a system for automatic logon and adjusts various system settings.
-
+    Configures a system for automatic logon and adjusts various system settings.
 .DESCRIPTION
-The `Initialize-Autologon` script automates the setup for system autologon, configures logging, and modifies specific registry entries. 
-The script also ensures required modules are installed and trusted sources are set.
-
-.PARAMETER autologonUsername
-The username for the autologon process.
-
-.PARAMETER autologonDomain
-The domain name of the network.
-
-.PARAMETER autologonPasswordSecure
-The password for the autologon process saved as a secure string.
-
-.PARAMETER autologonPassword
-The password in a readable format for Autologon.
-
-.PARAMETER autologonEULA
-Automatically accepts the EULA for Autologon.
-
+    Automates the setup for system autologon, configures logging, and modifies specific registry entries.
+    Ensures required modules are installed and trusted sources are set.
+.PARAMETER Username
+    The username for the autologon process.
+.PARAMETER Domain
+    The domain name for the autologon process. Defaults to 'wssu.edu'.
+.PARAMETER AutologonPath
+    Path to the Autologon executable. Defaults to '.\Autologon64.exe'.
 .NOTES
-File Name      : Initialize-Autologon.ps1
-Version        : 2.0.0
-Prerequisites  : Requires administrative privileges, PoShLog module.
-Author         : Fred Smith III
-Copyright 2023 : Valhalla Tech
-
+    File Name      : Initialize-Autologon.ps1
+    Version        : 2.1.0
+    Prerequisites  : Requires administrative privileges, PoShLog module.
+    Author         : Fred Smith III
 .EXAMPLE
-.\Initialize-Autologon.ps1
-
-This example prompts the user for a username and password and then initializes the autologon process and related configurations.
+    .\Initialize-Autologon.ps1 -Username 'serviceaccount' -Domain 'contoso.com'
 #>
 
-# Install Nuget Provider, if not already installed
-Install-PackageProvider -Name "NuGet" -Force
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
+    [string]$Username,
 
-# Set PSGallery as a trusted repository
-Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-...
-# Remaining script content
-...
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$Domain = 'wssu.edu',
 
+    [Parameter()]
+    [ValidateScript({ Test-Path $_ })]
+    [string]$AutologonPath = '.\Autologon64.exe'
+)
 
-# Install Nuget Provider, if not already installed
-Install-PackageProvider -Name "NuGet" -Force
+# --- Helper Functions for NuGet, PSGallery, and Module Import ---
 
-# Set PSGallery as a trusted repository
-Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-
-$modPoShLog = "PoShLog"
-$chkPoShLog = Get-Module -Name $modPoShLog
-
-# Check if PoShLog module is installed and if not install the current version
-if (-not $chkPoShLog) {
-    Install-Module -Name $modPoShLog -Repository "PSGallery" -Confirm:$false -Force
+function Install-NugetProvider {
+    if (-not (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue)) {
+        Install-PackageProvider -Name 'NuGet' -Force
+    }
 }
 
-# Import PoShLog module
-Import-Module -Name $modPoShLog
-
-# Configure variables for logging
-$logFileName = "Initialize-AutoLogon.log"
-$logFilePath = "C:\Logs\$logFileName"
-
-# Create logger instance
-$logger = New-Logger
-
-# Configure logger instance
-$logger |
-    Set-MinimumLevel -Value Information |
-    Add-SinkFile -Path $logFilePath |
-    Add-SinkConsole |
-    Start-Logger
-
-Write-InfoLog "PoShLog module imported and logger configured"
-
-# General variables
-$systemDrive = $env:SystemDrive
-$procExplorer = Get-Process "explorer"
-$taniumSoftware = "$systemDrive\Tanium_Software"
-
-# Registry path names
-$macLockScreenPath = "HKLM:Software\Policies\Microsoft\Windows\Personalization"
-$usrPowerCommandsPath = "HKCU:Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
-$usrScreenSaverPath = "HKCU:Software\Policies\Microsoft\Windows\Control Panel\Desktop"
-$macRegPoliciesPath = "HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
-$macRegWinlogonPath = "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
-$usrDesktopIcons = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-
-# Registry policy names
-$screenSaveActive = "ScreenSaveActive"
-$noClose = "NoClose"
-$lockScreenImage = "LockScreenImage"
-$lockScreenOverlaysdisabled = "LockscreenOverylaysDisabled"
-$poldisablecad = "disablecad"
-$poLLegalNoticeText = "LegalNoticeText"
-$polLegalNoticeCaption = "LegalNoticeCaption"
-$polHideIcons = "HideIcons"
-
-# Autologon Variables
-$autologonPath = "$taniumSoftware\CTS-ToolBox\Setup-GeneralAutoLogon\Autologon64.exe"
-$autologonUsername = Read-Host -Prompt "Please enter the username"
-$autologonDomain = "wssu.edu"
-$autologonPasswordSecure = Read-Host -Prompt "Please enter the password for the user" -AsSecureString
-$autologonPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($autologonPasswordSecure))
-$autologonEULA = "/accepteula"
-
-Write-InfoLog = "User credentials configured successfully"
-Write-InfoLog "Updating registry to enable autologon ..."
-
-# Testing registry paths. If they do not exist, then creating them
-if (-Not (Test-Path $macLockScreenPath)) {New-Item -Path $macLockScreenPath -ItemType RegistryKey -Force
-}
-if (-Not (Test-Path $usrPowerCommandsPath)) {New-Item -Path $usrPowerCommandsPath -ItemType RegistryKey -Force
-}
-if (-Not (Test-Path $usrScreenSaverPath)) {New-Item -Path $usrScreenSaverPath -ItemType RegistryKey -Force
-}
-if (-Not (Test-Path $macRegPoliciesPath)) {New-Item -Path $macRegPoliciesPath -ItemType RegistryKey -Force
-}
-if (-Not (Test-Path $macRegWinlogonPath)) {New-Item -Path $macRegWinlogonPath -ItemType RegistryKey -Force
-}
-if (-Not (Test-Path $usrDesktopIcons)) {New-Item -Path $usrDesktopIcons -ItemType RegistryKey -Force
+function Set-PsGalleryTrusted {
+    $psGallery = Get-PSRepository -Name 'PSGallery'
+    if ($psGallery.InstallationPolicy -ne 'Trusted') {
+        Set-PSRepository -Name 'PSGallery' -InstallationPolicy 'Trusted'
+    }
 }
 
-# Digital signage default settings
-# Machine policies
-Remove-ItemProperty -Path $maclockScreenPath -Name $lockScreenImage
-Set-ItemProperty -Path $maclockScreenPath -Name $lockScreenOverlaysdisabled -Type DWord -Value "1"
-Set-ItemProperty -Path $macRegPoliciesPath -Name $poldisablecad -Value "1"
-Remove-ItemProperty -Path $macRegPoliciesPath -Name $polLegalNoticeText
-Remove-ItemProperty -Path $macRegPoliciesPath -Name $polLegalNoticeCaption
+function Import-RequiredModule {
+    param (
+        [string]$moduleName
+    )
+    if (-not (Get-Module -ListAvailable -Name $moduleName)) {
+        Install-Module -Name $moduleName -Force -Scope CurrentUser
+    }
+    Import-Module -Name $moduleName -Force
+}
 
-# User policies
-Set-ItemProperty -Path $usrPowerCommandsPath -Name $noClose -Type DWord -Value "1"
-Set-ItemProperty -Path $usrScreenSaverPath -Name $screenSaveActive -Value "0"
-Set-ItemProperty -Path $usrDesktopIcons -Name $polHideIcons -Value "1"
+function Initialize-Logging {
+    <#
+    .SYNOPSIS
+        Configures the PoShLog logging system.
+    #>
+    $logFileName = 'Initialize-AutoLogon.log'
+    $logFilePath = "$env:SystemDrive\Logs\$logFileName"
 
-Write-InfoLog "Registry updated"
+    # Ensure log directory exists
+    $logDir = Split-Path $logFilePath -Parent
+    if (-not (Test-Path $logDir)) {
+        New-Item -Path $logDir -ItemType Directory -Force | Out-Null
+    }
 
-# Cycle explorer
-Stop-Process $procExplorer
+    $logger = New-Logger
+    $logger |
+        Set-MinimumLevel -Value Information |
+        Add-SinkFile -Path $logFilePath |
+        Add-SinkConsole |
+        Start-Logger
 
-# Utilize Autologon app
+    Write-InfoLog 'PoShLog module imported and logger configured'
+}
+
+function Test-RegistryPath {
+    <#
+    .SYNOPSIS
+        Tests and creates registry paths if they don't exist.
+    .PARAMETER Path
+        The registry path to test and create.
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$Path
+    )
+
+    if (-not (Test-Path $Path)) {
+        try {
+            New-Item -Path $Path -ItemType RegistryKey -Force | Out-Null
+            Write-InfoLog "Created registry path: $Path"
+        }
+        catch {
+            Write-ErrorLog "Failed to create registry path $Path`: $($_.Exception.Message)"
+            throw
+        }
+    }
+}
+
+function Set-RegistryValue {
+    <#
+    .SYNOPSIS
+        Safely sets a registry value with error handling.
+    .PARAMETER Path
+        The registry path.
+    .PARAMETER Name
+        The value name.
+    .PARAMETER Value
+        The value data.
+    .PARAMETER Type
+        The value type.
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        [Parameter(Mandatory)]
+        [string]$Name,
+
+        [Parameter(Mandatory)]
+        $Value,
+
+        [Parameter()]
+        [string]$Type = 'String'
+    )
+
+    try {
+        $setParams = @{
+            Path = $Path
+            Name = $Name
+            Value = $Value
+        }
+        if ($Type -ne 'String') {
+            $setParams.Type = $Type
+        }
+
+        Set-ItemProperty @setParams
+        Write-InfoLog "Set registry value: $Path\$Name = $Value"
+    }
+    catch {
+        Write-ErrorLog "Failed to set registry value $Path\$Name`: $($_.Exception.Message)"
+        throw
+    }
+}
+
+function Remove-RegistryValue {
+    <#
+    .SYNOPSIS
+        Safely removes a registry value with error handling.
+    .PARAMETER Path
+        The registry path.
+    .PARAMETER Name
+        The value name.
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        [Parameter(Mandatory)]
+        [string]$Name
+    )
+
+    try {
+        if (Get-ItemProperty -Path $Path -Name $Name -ErrorAction SilentlyContinue) {
+            Remove-ItemProperty -Path $Path -Name $Name -Force
+            Write-InfoLog "Removed registry value: $Path\$Name"
+        }
+    }
+    catch {
+        Write-ErrorLog "Failed to remove registry value $Path\$Name`: $($_.Exception.Message)"
+    }
+}
+
+function Set-DigitalSignageSettings {
+    <#
+    .SYNOPSIS
+        Configures registry settings for digital signage mode.
+    #>
+    # Registry paths
+    $macLockScreenPath = 'HKLM:Software\Policies\Microsoft\Windows\Personalization'
+    $usrPowerCommandsPath = 'HKCU:Software\Microsoft\Windows\CurrentVersion\Policies\Explorer'
+    $usrScreenSaverPath = 'HKCU:Software\Policies\Microsoft\Windows\Control Panel\Desktop'
+    $macRegPoliciesPath = 'HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'
+    $macRegWinlogonPath = 'HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
+    $usrDesktopIcons = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
+
+    # Create registry paths if they don't exist
+    $registryPaths = @(
+        $macLockScreenPath, $usrPowerCommandsPath, $usrScreenSaverPath,
+        $macRegPoliciesPath, $macRegWinlogonPath, $usrDesktopIcons
+    )
+
+    foreach ($path in $registryPaths) {
+        Test-RegistryPath -Path $path
+    }
+
+    # Configure machine policies
+    Remove-RegistryValue -Path $macLockScreenPath -Name 'LockScreenImage'
+    Set-RegistryValue -Path $macLockScreenPath -Name 'LockscreenOverlaysDisabled' -Value 1 -Type 'DWord'
+    Set-RegistryValue -Path $macRegPoliciesPath -Name 'disablecad' -Value 1
+    Remove-RegistryValue -Path $macRegPoliciesPath -Name 'LegalNoticeText'
+    Remove-RegistryValue -Path $macRegPoliciesPath -Name 'LegalNoticeCaption'
+
+    # Configure user policies
+    Set-RegistryValue -Path $usrPowerCommandsPath -Name 'NoClose' -Value 1 -Type 'DWord'
+    Set-RegistryValue -Path $usrScreenSaverPath -Name 'ScreenSaveActive' -Value '0'
+    Set-RegistryValue -Path $usrDesktopIcons -Name 'HideIcons' -Value 1
+
+    Write-InfoLog 'Digital signage registry settings configured'
+}
+
+function Restart-Explorer {
+    <#
+    .SYNOPSIS
+        Safely restarts Windows Explorer.
+    #>
+    try {
+        $explorerProcess = Get-Process -Name 'explorer' -ErrorAction SilentlyContinue
+        if ($explorerProcess) {
+            Stop-Process -Name 'explorer' -Force
+            Write-InfoLog 'Explorer process stopped'
+
+            # Wait a moment then start explorer again
+            Start-Sleep -Seconds 2
+            Start-Process -FilePath 'explorer.exe'
+            Write-InfoLog 'Explorer process restarted'
+        }
+    }
+    catch {
+        Write-ErrorLog "Failed to restart Explorer: $($_.Exception.Message)"
+    }
+}
+
+function Start-AutologonConfiguration {
+    <#
+    .SYNOPSIS
+        Configures autologon using the Autologon executable.
+    .PARAMETER Username
+        The username for autologon.
+    .PARAMETER Domain
+        The domain for autologon.
+    .PARAMETER Password
+        The secure string password.
+    .PARAMETER AutologonPath
+        Path to the Autologon executable.
+    #>
+    param (
+        [Parameter(Mandatory)]
+        [string]$Username,
+
+        [Parameter(Mandatory)]
+        [string]$Domain,
+
+        [Parameter(Mandatory)]
+        [SecureString]$Password,
+
+        [Parameter(Mandatory)]
+        [string]$AutologonPath
+    )
+
+    try {
+        # Convert SecureString to plain text for Autologon.exe (required by the tool)
+        $credential = New-Object System.Management.Automation.PSCredential($Username, $Password)
+        $plainPassword = $credential.GetNetworkCredential().Password
+
+        $processParams = @{
+            FilePath = $AutologonPath
+            ArgumentList = @($Username, $Domain, $plainPassword, '/accepteula')
+            Wait = $true
+            ErrorAction = 'Stop'
+        }
+
+        Start-Process @processParams
+        Write-InfoLog 'Autologon successfully configured'
+    }
+    catch {
+        Write-ErrorLog "Autologon configuration failed: $($_.Exception.Message)"
+        throw
+    }
+    finally {
+        # Clear the plain text password from memory (best effort security)
+        if ($plainPassword) {
+            $plainPassword = $null
+            [System.GC]::Collect()
+        }
+    }
+}
+
+# --- Script Execution ---
+
 try {
-    Start-Process -FilePath $autologonPath -ArgumentList $autologonUsername, $autologonDomain, $autologonPassword, $autologonEULA -ErrorAction Stop
+    Write-Output 'Setting up unattended module installation...'
+
+    # Install required modules and configure logging using standardized functions
+    Install-NugetProvider
+    Set-PsGalleryTrusted
+    Import-RequiredModule -moduleName 'PoShLog'
+
+    Initialize-Logging
+
+    # Get user credentials securely
+    $passwordSecure = Read-Host -Prompt "Please enter the password for user '$Username'" -AsSecureString
+    Write-InfoLog 'User credentials configured successfully'
+
+    # Configure system settings
+    Write-InfoLog 'Updating registry to enable autologon...'
+    Set-DigitalSignageSettings
+
+    # Restart Explorer to apply changes
+    Restart-Explorer
+
+    # Configure autologon
+    Start-AutologonConfiguration -Username $Username -Domain $Domain -Password $passwordSecure -AutologonPath $AutologonPath
+
+    Write-InfoLog 'Autologon initialization completed successfully'
 }
 catch {
-    Write-ErrorLog "Autologon was not able to run successfully"
+    Write-ErrorLog "Script execution failed: $($_.Exception.Message)"
+    throw
+}
+finally {
     Close-Logger
 }
-
-Write-InfoLog "Autologon successfully configured"
-
-# Close PoShLog instance
-Close-Logger
