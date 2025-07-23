@@ -31,6 +31,7 @@
       <rule>Use splatting for cmdlet parameters where appropriate.</rule>
       <rule>Add inline comments for clarity.</rule>
       <rule>Ensure compatibility with PowerShell 5.1.</rule>
+      <rule>Use CIM instead of WMI</rule>
       <rule>Implement robust error handling and logging.</rule>
       <rule>If a third-party logger is user, such as PoShLog, use that for logging once it's instantiated.</rule>
     </syntax>
