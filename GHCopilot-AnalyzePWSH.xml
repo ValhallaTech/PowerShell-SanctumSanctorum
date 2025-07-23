@@ -22,7 +22,8 @@
         <rule>Avoid unnecessary subexpressions (e.g., prefer <code>$env:VAR</code> over <code>$($env:VAR)</code>).</rule>
         <rule>Use splatting for cmdlet parameters when appropriate.</rule>
         <rule>Include comment-based help for the script and all functions.</rule>
-        <rule>Avoid aliases in scripts (e.g., use <code>Where-Object</code> instead of <code>?</code>).</rule>
+        <rule>Avoid aliases in scripts.</rule>
+        <rule>Use CIM instead of WMI</rule>
         <rule>Implement robust error handling and logging.</rule>
         <rule>If a third-party logger is user, such as PoShLog, use that for logging once it's instantiated.</rule>
         <rule>Ensure compatibility with PowerShell 5.1.</rule>
