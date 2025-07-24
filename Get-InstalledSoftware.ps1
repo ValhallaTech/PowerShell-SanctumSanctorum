@@ -32,7 +32,7 @@ param(
 # Ensure NuGet provider is installed
 function Install-NugetProvider {
     if (-not (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue)) {
-        Install-PackageProvider -Name 'NuGet' -Force
+        Install-PackageProvider -Name 'NuGet' -Force -Confirm:$false
     }
 }
 
