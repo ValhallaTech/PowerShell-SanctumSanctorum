@@ -9,7 +9,7 @@
 param ()
 
 function Test-ChocolateyInstalled {
-    $chocoPath = "$env:SystemDrive\ProgramData\chocolatey\bin\choco.exe"
+    $chocoPath = Join-Path $env:ProgramData 'chocolatey\bin\choco.exe'
     $chocoInPath = Get-Command -Name 'choco' -ErrorAction SilentlyContinue
     if (Test-Path $chocoPath) { return $true }
     if ($null -ne $chocoInPath) { return $true }
@@ -47,17 +47,31 @@ function Install-Chocolatey {
     }
 }
 
-function Test-AdminRights {
-    $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $principal = New-Object Security.Principal.WindowsPrincipal $currentIdentity
-    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+function Ensure-ElevatedSession {
+    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if ($isAdmin) {
+        return
+    }
+
+    Write-Output 'Script is not running as administrator. Relaunching with elevated privileges...'
+
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = 'powershell.exe'
+    $psi.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    $psi.Verb = 'runas'
+
+    try {
+        [System.Diagnostics.Process]::Start($psi) | Out-Null
+    }
+    catch {
+        Write-Error 'Failed to relaunch script as administrator.'
+    }
+
+    exit
 }
 
 function Invoke-HPImageAssistantSetup {
-    if (-not (Test-AdminRights)) {
-        Write-Error 'This script must be run as administrator.'
-        exit 1
-    }
+    Ensure-ElevatedSession
 
     $isInstalled = Test-ChocolateyInstalled
     Write-Result -isInstalled $isInstalled
@@ -82,14 +96,20 @@ function Invoke-HPImageAssistantSetup {
         throw
     }
 
-    $hpiaPath = 'C:\ProgramData\chocolatey\lib\hpimageassistant\tools\HPImageAssistant.exe'
+    $hpiaPath = Join-Path $env:ProgramData 'chocolatey\lib\hpimageassistant\tools\HPImageAssistant.exe'
     if (Test-Path $hpiaPath) {
         try {
-            Start-Process -FilePath $hpiaPath
-            Write-Output "HP Image Assistant launched from '$hpiaPath'."
+            $hpiaParams = @{
+                FilePath     = $hpiaPath
+                ArgumentList = '/Operation:Analyze /Selection:All /Categories:All /Action:Install /ReportFolder:C:\HPIA\Reports /SoftpaqDownloadFolder:C:\HPIA\Downloads /NonInteractive'
+                Wait         = $true
+                NoNewWindow  = $true
+            }
+            Start-Process @hpiaParams
+            Write-Output 'HP Image Assistant analysis and installation complete.'
         }
         catch {
-            Write-Error "Failed to launch HP Image Assistant: $($_.Exception.Message)"
+            Write-Error "Failed to run HP Image Assistant: $($_.Exception.Message)"
         }
     }
     else {
