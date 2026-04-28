@@ -1,121 +1,187 @@
-# Remove-UserProfiles.ps1
+#Requires -Version 5.1
 
 <#
 .SYNOPSIS
     Deletes user profiles on a computer, excluding specified accounts.
 
 .DESCRIPTION
-    This script deletes all user profiles on a computer except those listed in the $acctsExcluded variable.
-    It checks if the WinRM service is running and configures it if necessary.
+    This script deletes all user profiles on a computer except those listed in the
+    ExcludedAccounts parameter. It verifies that the WinRM service is running and
+    configures it if necessary.
+
+    Prerequisite operations (NuGet provider, PSGallery trust, and PoShLog module
+    installation) always run because they are required for the script to function.
+    Specify -WhatIf to preview which profiles would be removed and whether WinRM
+    would be reconfigured, without committing any of those state-changing operations.
+
+.PARAMETER ExcludedAccounts
+    An array of account usernames or SIDs to exclude from the removal process.
+    Defaults to 'ramadmin' and the built-in SYSTEM, LOCAL SERVICE, and NETWORK
+    SERVICE accounts.
+
+.PARAMETER LogPath
+    Full path to the log file. The parent directory must already exist.
+    Defaults to C:\Logs\Remove-UserProfiles.log.
 
 .EXAMPLE
     .\Remove-UserProfiles.ps1
 
+    Removes all user profiles not present in the default exclusion list.
+
+.EXAMPLE
+    .\Remove-UserProfiles.ps1 -WhatIf
+
+    Previews which profiles would be removed and whether WinRM would be configured,
+    without making any changes to user profiles or WinRM state.
+
+.EXAMPLE
+    .\Remove-UserProfiles.ps1 -ExcludedAccounts @('jdoe', 'S-1-5-18', 'S-1-5-19', 'S-1-5-20') -LogPath 'D:\Logs\profiles.log'
+
+    Removes all user profiles except jdoe and the built-in service accounts,
+    writing the log to a custom path.
+
 .NOTES
-    Version: 1.3.0
+    Version: 2.1.0
     Author: Fred Smith
     Creation Date: 04/10/2023
 
-    acctsExcluded:
-    An array of account names (usernames or SIDs) that should be excluded from the removal process. This includes ramadmin and built-in accounts.
-
     Invoke-WinRM:
-    A function that will check if the WinRM service is running and if it is not, it will configure and start the service. This service is required for the script to work.
+    A function that checks if the WinRM service is running and, if it is not,
+    configures and starts the service. WinRM is required for the script to work.
 
     Additional notes:
-    WARNING: Be aware that this is a very powerful and destructive script. It will delete all user profiles and everything saved under it locally. Do not run it unless you know what you're doing.
+    WARNING: Be aware that this is a very powerful and destructive script. It will
+    delete all user profiles and everything saved under them locally. Do not run it
+    unless you know what you are doing.
     Make sure you run the script in an elevated PowerShell session.
 #>
 
-# Install Nuget Provider, if not already installed
-Install-PackageProvider -Name "NuGet" -Force
+[CmdletBinding(SupportsShouldProcess)]
+param (
+    [Parameter()]
+    [string[]]$ExcludedAccounts = @(
+        'ramadmin',
+        'S-1-5-18', # SYSTEM
+        'S-1-5-19', # LOCAL SERVICE
+        'S-1-5-20'  # NETWORK SERVICE
+    ),
 
-# Set PSGallery as a trusted repository
-Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+    [Parameter()]
+    [string]$LogPath = 'C:\Logs\Remove-UserProfiles.log'
+)
 
-$modPoShLog = "PoShLog"
-$chkPoShLog = Get-Module -Name $modPoShLog
+Set-StrictMode -Version Latest
 
-# Check if PoShLog module is installed and if not install the current version
-if (-not $chkPoShLog) {
-    Install-Module -Name $modPoShLog -Repository "PSGallery" -Confirm:$false -Force
-}
-
-# Import PoShLog module
-Import-Module -Name $modPoShLog
-
-# Configure variables for logging
-$logFileName = "Remove-UserProfiles.log"
-$logFilePath = "C:\Logs\$logFileName"
-
-# Create logger instance
-$logger = New-Logger
-
-# Configure logger instance
-$logger |
-    Set-MinimumLevel -Value Information |
-    Add-SinkFile -Path $logFilePath |
-    Add-SinkConsole |
-    Start-Logger
-
-Write-InfoLog "PoShLog module imported and logger configured"
-
-# Check to see if the user is running an elevated instance. Log success or failure. Exit if not elevated or the check fails.
+# Elevation check runs first - before any side effects (module installs, logger
+# setup) so we fail fast without leaving partial state behind. The logger is not
+# yet available here, so Write-Error is used instead of Write-ErrorLog.
 try {
     $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-    if ($isAdmin) {
-        Write-InfoLog "Administrative privileges confirmed. Script running as administrator."
-    } else {
-        Write-ErrorLog "Script must be run as an administrator. Exiting script."
-        Close-Logger
+    if (-not $isAdmin) {
+        Write-Error 'Script must be run as an administrator. Exiting script.'
         exit 1
     }
 } catch {
-    Write-ErrorLog "Failed to check administrative privileges: $_"
-    Close-Logger
+    Write-Error "Failed to check administrative privileges: $_"
     exit 1
 }
 
-# Function to check if WinRM service is running and configured
+# Install NuGet provider only if not already available
+if (-not (Get-PackageProvider -Name 'NuGet' -ListAvailable -ErrorAction SilentlyContinue)) {
+    Install-PackageProvider -Name 'NuGet' -Force
+}
+
+# Trust PSGallery only if it is not already trusted
+$psGallery = Get-PSRepository -Name 'PSGallery'
+if ($psGallery.InstallationPolicy -ne 'Trusted') {
+    Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
+}
+
+# Install PoShLog if not already available
+if (-not (Get-Module -ListAvailable -Name 'PoShLog')) {
+    Install-Module -Name 'PoShLog' -Repository 'PSGallery' -Confirm:$false -Force
+}
+
+# Import PoShLog module
+Import-Module -Name 'PoShLog'
+
+# Function to verify WinRM is running; configures it if it is not.
+# Uses SupportsShouldProcess so Set-WSManQuickConfig is gated by -WhatIf.
 function Invoke-WinRM {
-    Write-InfoLog "Checking if WinRM service is running and configured"
-    $winrmService = Get-Service -Name WinRM
-    $winrmCommand = Set-WSManQuickConfig -Force
-    if ($winrmService.Status -ne "Running") {
-        Write-InfoLog "WinRM service is not running. Configuring..."
+    <#
+    .SYNOPSIS
+        Ensures the WinRM service is running and properly configured.
+    .DESCRIPTION
+        Checks the WinRM service status and calls Set-WSManQuickConfig if the
+        service is not running. Supports -WhatIf: when specified, reports what
+        would be configured without making any changes. Exits the script with
+        code 1 on failure.
+    .EXAMPLE
+        Invoke-WinRM
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
+    param ()
+
+    Write-InfoLog 'Checking if WinRM service is running and configured'
+    try {
+        $winrmService = Get-Service -Name 'WinRM' -ErrorAction Stop
+    } catch {
+        Write-ErrorLog "Failed to query WinRM service status: $_"
+        exit 1
+    }
+
+    if ($winrmService.Status -ne 'Running') {
+        Write-InfoLog 'WinRM service is not running. Configuring...'
         try {
-            $winrmCommand
-            Write-InfoLog "WinRM has been configured successfully."
+            if ($PSCmdlet.ShouldProcess('WinRM', 'Configure WinRM service')) {
+                Set-WSManQuickConfig -Force -ErrorAction Stop
+                Write-InfoLog 'WinRM has been configured successfully.'
+            }
         } catch {
             Write-ErrorLog "An error occurred while configuring WinRM: $_"
-            Close-Logger
             exit 1
         }
     } else {
-        Write-InfoLog "WinRM service is running."
+        Write-InfoLog 'WinRM service is running.'
     }
 }
 
-Invoke-WinRM
-Write-InfoLog "WinRM service check completed"
-
-# Variables that create an array of the accounts to be excluded from removal process
-$acctsExcluded = @("ramadmin", "S-1-5-18", "S-1-5-19", "S-1-5-20")
-
-# Method that will delete all of the user profiles on a computer, except the accounts listed in the $acctsExcluded variable
-Write-InfoLog "Removing user profiles..."
+# Wrap the main script body in try/finally to guarantee Close-Logger is always
+# called, even if an unexpected terminating error occurs. The logger is
+# initialised inside this guarded region so teardown is always reached.
 try {
-    Get-CimInstance -Class Win32_UserProfile | Where-Object {
-        ($_.LocalPath -ne $null) -and
-        ($_.LocalPath.split('\')[-1] -notin $acctsExcluded) -and
-        ($_.SID -notin $acctsExcluded)
-    } | Remove-CimInstance -ErrorAction Stop
-    Write-InfoLog "User profiles removed successfully."
-} catch {
-    Write-ErrorLog "Failed to remove one or more user profiles: $_"
-    Close-Logger
-    exit 1
-}
+    # Initialise the logger inside the guarded region so Close-Logger is
+    # guaranteed on any exit path, including failures during logger setup.
+    New-Logger |
+        Set-MinimumLevel -Value Information |
+        Add-SinkFile -Path $LogPath |
+        Add-SinkConsole |
+        Start-Logger
 
-Write-InfoLog "Script completed"
-Close-Logger
+    Write-InfoLog 'PoShLog module imported and logger configured'
+
+    Invoke-WinRM
+    Write-InfoLog 'WinRM service check completed'
+
+    # Remove all user profiles not present in the exclusion list
+    Write-InfoLog 'Removing user profiles...'
+    try {
+        Get-CimInstance -Class Win32_UserProfile -ErrorAction Stop | Where-Object {
+            ($null -ne $_.LocalPath) -and
+            ($_.LocalPath.Split('\')[-1] -notin $ExcludedAccounts) -and
+            ($_.SID -notin $ExcludedAccounts)
+        } | ForEach-Object {
+            if ($PSCmdlet.ShouldProcess($_.LocalPath, 'Remove user profile')) {
+                Remove-CimInstance -InputObject $_ -ErrorAction Stop
+            }
+        }
+        Write-InfoLog 'User profiles removed successfully.'
+    } catch {
+        Write-ErrorLog "Failed to remove one or more user profiles: $_"
+        exit 1
+    }
+
+    Write-InfoLog 'Script completed'
+} finally {
+    Close-Logger
+}
