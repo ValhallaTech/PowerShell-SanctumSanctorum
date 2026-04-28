@@ -7,8 +7,12 @@
 .DESCRIPTION
     This script deletes all user profiles on a computer except those listed in the
     ExcludedAccounts parameter. It verifies that the WinRM service is running and
-    configures it if necessary. Supports -WhatIf for a safe dry-run preview of
-    which profiles would be removed before committing to any changes.
+    configures it if necessary.
+
+    Prerequisite operations (NuGet provider, PSGallery trust, and PoShLog module
+    installation) always run because they are required for the script to function.
+    Specify -WhatIf to preview which profiles would be removed and whether WinRM
+    would be reconfigured, without committing any of those state-changing operations.
 
 .PARAMETER ExcludedAccounts
     An array of account usernames or SIDs to exclude from the removal process.
@@ -27,7 +31,8 @@
 .EXAMPLE
     .\Remove-UserProfiles.ps1 -WhatIf
 
-    Previews which profiles would be removed without making any changes.
+    Previews which profiles would be removed and whether WinRM would be configured,
+    without making any changes to user profiles or WinRM state.
 
 .EXAMPLE
     .\Remove-UserProfiles.ps1 -ExcludedAccounts @('jdoe', 'S-1-5-18', 'S-1-5-19', 'S-1-5-20') -LogPath 'D:\Logs\profiles.log'
@@ -36,7 +41,7 @@
     writing the log to a custom path.
 
 .NOTES
-    Version: 2.0.0
+    Version: 2.1.0
     Author: Fred Smith
     Creation Date: 04/10/2023
 
@@ -67,7 +72,7 @@ param (
 
 Set-StrictMode -Version Latest
 
-# Elevation check runs first — before any side effects (module installs, logger
+# Elevation check runs first - before any side effects (module installs, logger
 # setup) so we fail fast without leaving partial state behind. The logger is not
 # yet available here, so Write-Error is used instead of Write-ErrorLog.
 try {
@@ -100,36 +105,38 @@ if (-not (Get-Module -ListAvailable -Name 'PoShLog')) {
 # Import PoShLog module
 Import-Module -Name 'PoShLog'
 
-# Initialise the logger; Close-Logger is guaranteed by the finally block below
-New-Logger |
-    Set-MinimumLevel -Value Information |
-    Add-SinkFile -Path $LogPath |
-    Add-SinkConsole |
-    Start-Logger
-
-Write-InfoLog 'PoShLog module imported and logger configured'
-
-# Function to verify WinRM is running; configures it if it is not
+# Function to verify WinRM is running; configures it if it is not.
+# Uses SupportsShouldProcess so Set-WSManQuickConfig is gated by -WhatIf.
 function Invoke-WinRM {
     <#
     .SYNOPSIS
         Ensures the WinRM service is running and properly configured.
     .DESCRIPTION
         Checks the WinRM service status and calls Set-WSManQuickConfig if the
-        service is not running. Exits the script with code 1 on failure.
+        service is not running. Supports -WhatIf: when specified, reports what
+        would be configured without making any changes. Exits the script with
+        code 1 on failure.
     .EXAMPLE
         Invoke-WinRM
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param ()
 
     Write-InfoLog 'Checking if WinRM service is running and configured'
-    $winrmService = Get-Service -Name 'WinRM'
+    try {
+        $winrmService = Get-Service -Name 'WinRM' -ErrorAction Stop
+    } catch {
+        Write-ErrorLog "Failed to query WinRM service status: $_"
+        exit 1
+    }
+
     if ($winrmService.Status -ne 'Running') {
         Write-InfoLog 'WinRM service is not running. Configuring...'
         try {
-            Set-WSManQuickConfig -Force -ErrorAction Stop
-            Write-InfoLog 'WinRM has been configured successfully.'
+            if ($PSCmdlet.ShouldProcess('WinRM', 'Configure WinRM service')) {
+                Set-WSManQuickConfig -Force -ErrorAction Stop
+                Write-InfoLog 'WinRM has been configured successfully.'
+            }
         } catch {
             Write-ErrorLog "An error occurred while configuring WinRM: $_"
             exit 1
@@ -140,15 +147,26 @@ function Invoke-WinRM {
 }
 
 # Wrap the main script body in try/finally to guarantee Close-Logger is always
-# called, even if an unexpected terminating error occurs.
+# called, even if an unexpected terminating error occurs. The logger is
+# initialised inside this guarded region so teardown is always reached.
 try {
+    # Initialise the logger inside the guarded region so Close-Logger is
+    # guaranteed on any exit path, including failures during logger setup.
+    New-Logger |
+        Set-MinimumLevel -Value Information |
+        Add-SinkFile -Path $LogPath |
+        Add-SinkConsole |
+        Start-Logger
+
+    Write-InfoLog 'PoShLog module imported and logger configured'
+
     Invoke-WinRM
     Write-InfoLog 'WinRM service check completed'
 
     # Remove all user profiles not present in the exclusion list
     Write-InfoLog 'Removing user profiles...'
     try {
-        Get-CimInstance -Class Win32_UserProfile | Where-Object {
+        Get-CimInstance -Class Win32_UserProfile -ErrorAction Stop | Where-Object {
             ($null -ne $_.LocalPath) -and
             ($_.LocalPath.Split('\')[-1] -notin $ExcludedAccounts) -and
             ($_.SID -notin $ExcludedAccounts)
