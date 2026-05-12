@@ -85,7 +85,7 @@ function Import-RequiredModule {
 function Start-PoShLogger {
     <#
     .SYNOPSIS
-        Initialises a PoShLog logger with a file sink and a console sink.
+        Initializes a PoShLog logger with a file sink and a console sink.
     .DESCRIPTION
         Creates and starts a PoShLog logger configured to write structured log
         messages to both a log file and the console at Information level or above.
@@ -119,7 +119,7 @@ Import-RequiredModule -ModuleName 'PoShLog'
 
 #endregion
 
-#region Logger Initialisation
+#region Logger Initialization
 
 $logDir = Join-Path -Path $env:SystemDrive -ChildPath 'Logs'
 if (-not (Test-Path -Path $logDir)) {
@@ -131,7 +131,7 @@ $logFileName    = if ($scriptBaseName) { "$scriptBaseName.log" } else { 'Update-
 $logFilePath    = Join-Path -Path $env:SystemDrive -ChildPath "Logs\$logFileName"
 
 Start-PoShLogger -LogFilePath $logFilePath
-Write-InfoLog 'Logger initialised successfully'
+Write-InfoLog 'Logger initialized successfully'
 
 #endregion
 
